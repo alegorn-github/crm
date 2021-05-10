@@ -65,6 +65,9 @@
   --black: #333333;
   --red: #F06A4D;
   --state-delay:300ms;
+  --firm-filter: invert(46%) sepia(54%) saturate(941%) hue-rotate(216deg) brightness(101%) contrast(102%);
+  --grey-filter: invert(99%) sepia(2%) saturate(6135%) hue-rotate(186deg) brightness(83%) contrast(94%);
+  --red-filter: invert(51%) sepia(26%) saturate(1747%) hue-rotate(325deg) brightness(99%) contrast(90%);
 }
 
 .container {
@@ -164,24 +167,20 @@ body {
 
 .logo {
   position: relative;
+  width: 50px;
+  height: 50px;
   margin-right: 53px; 
   outline: none;
-}
-
-.logo__circle {
-  fill: var(--firm);
-  transition: fill var(--state-delay);
-}
-
-.logo__path {
-  fill: white;
+  background-image: url(../img/logo.svg);
+  filter: opacity(1);
+  transition: filter var(--state-delay);
 }
 
 .logo::before{
   content: '';
   position: absolute;
   top: -4px;
-  bottom: -2px;
+  bottom: -4px;
   left: -4px;
   right: -4px;
   border: 2px solid transparent;
@@ -193,12 +192,8 @@ body {
   border-color: var(--firm);
 }
 
-.logo:hover .logo__circle{
-  fill: var(--firm-light);
-}
-
-.logo:active .logo__circle{
-  fill: var(--firm-dark);
+.logo:hover, .logo:active{
+  filter: opacity(0.7);
 }
 
 .header__search-container {
@@ -228,7 +223,6 @@ body {
 .header__search-results {
   position: absolute;
   width: 100%;
-  /* max-height: 180px; */
   top: 100%;
   background-color: white;
   border: 1px solid var(--grey);
@@ -277,19 +271,22 @@ body {
 }
 
 .wait-icon {
-  animation: rotate 1500ms linear infinite;  
+  animation: rotate 1500ms linear infinite;
+  background-image: url(../img/wait.svg);  
+  background-repeat: no-repeat;
+  background-size: contain;
 }
 
 .wait-icon--firm {
-  stroke: var(--firm);
+  filter: var(--firm-filter);
 }
 
 .wait-icon--red {
-  stroke: var(--red);
+  filter: var(--red-filter);
 }
 
 .wait-icon--firm-light {
-  stroke: var(--firm-light);
+  filter: var(--firm-filter);
 }
 
 .table__wait-icon {
@@ -323,15 +320,11 @@ body {
 
 .table {
   width: 100%;
-  /* margin-bottom: 40px; */
   border-spacing: 0;
   border-collapse: collapse;
-  /* font-family: 'Opensans'; */
 }
 
 .table__caption{
-  /* margin-bottom: 18px; */
-  /* font-family: 'Opensans'; */
   font-style: normal;
   font-weight: bold;
   font-size: 24px;
@@ -379,7 +372,7 @@ body {
   color: var(--black);
 }
 
-.thead__button:hover > .thead__sort > svg, .thead__button:focus > .thead__sort > svg{
+.thead__button:hover > .thead__sort, .thead__button:focus > .thead__sort{
   opacity: 1;
 }
 
@@ -391,35 +384,47 @@ body {
   display: inline-block;
   width: 12px;
   height: 12px;
-  fill: var(--firm);
+  background-image: url(../img/arrow_downward.svg);
+  background-repeat: no-repeat;
 }
 
-.thead__sort > svg {
-  opacity: 0.7;
+.thead__sort {
   transform: translateY(2px) scaleY(-1);  
-  transition: opacity var(--state-delay);
+  transition: opacity var(--state-delay), transform var(--state-delay);
 }
 
 
-.thead__button[data-desc=desc] .thead__sort > svg {
+.thead__button[data-desc=desc] .thead__sort {
   transform: translateY(2px) scaleY(1); 
 }
 
-.thead__button[data-type=text] > .thead__sort{
+.thead__button[data-type=text] .thead__sort{
   width: 36px;
+  transform: translateY(0) scaleY(-1);    
 }
 
-.thead__button[data-type=text]{
+.thead__button[data-type=text][data-desc=desc] .thead__sort{
+  width: 36px;
+  transform: translateY(0) scaleY(1); 
+}
+
+
+.thead__button[data-type=text] {
   padding-right: 25px;
 }
 
 .thead__button[data-type=text] .thead__sort::after{
   content: 'А-Я';
+  height: 12px;
+  display: inline-block;
+  padding-left: 12px;
   font-size: 12px;
+  transform: scaleY(-1);
 }
 
 .thead__button[data-desc=desc][data-type=text] .thead__sort::after{
   content: 'Я-А';
+  transform: initial; 
 }
 
 .thead__button--selected{
@@ -473,12 +478,10 @@ body {
 
 .row__time {
   display: inline-block;
-  /* padding-left: 7px; */
   color: var(--txt_grey);
 }
 
 .row__contact-list{
-  /* display: flex; */
   flex-wrap: wrap;
   vertical-align: middle;
 }
@@ -587,7 +590,7 @@ body {
 
 .row__delete-btn {
   padding-left: 15px;
-  background-image: url(../img/cancel.svg);
+  background-image: url(../img/cancel--red.svg);
   background-repeat: no-repeat;
   background-position: left;
   transition: color var(--state-delay);
@@ -603,8 +606,20 @@ body {
   line-height: 19px;
 }
 
-.main__add-btn > svg {
-  transform: translateY(3px);  
+.main__add-icon {
+  display: inline-block;
+  width: 32px;
+  height: 16px;
+  padding-right: 10px;
+  background-image: url(../img/add.svg);
+  background-repeat: no-repeat;
+  transform: translateY(3px);
+  filter: invert(57%) sepia(44%) saturate(5835%) hue-rotate(226deg) brightness(101%) contrast(101%);  
+  transition: filter var(--state-delay);
+}
+
+.main__add-btn:hover > .main__add-icon, .main__add-btn:focus > .main__add-icon, .main__add-btn:active > .main__add-icon{
+  filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(101deg) brightness(111%) contrast(101%);
 }
 
 .secondary {
@@ -701,7 +716,6 @@ body {
 
 .edit-form {
   width: 450px;
-  /* min-height: 400px; */
   max-height: 100vh;
   max-height: calc(var(--vh, 1vh) * 100);  
   background-color: white;
@@ -725,16 +739,13 @@ body {
   right: 15px;
   width: 29px;
   height: 29px;
-  fill: var(--grey);
-  transition: fill var(--state-delay);
+  background-image: url(../img/close.svg);
+  filter: var(--grey-filter);
+  transition: filter var(--state-delay);
 }
 
-.modal__close-btn:hover, .modal__close-btn:focus {
-  fill: var(--firm);
-}
-
-.modal__close-btn:active {
-  fill: var(--firm-dark);
+.modal__close-btn:hover, .modal__close-btn:focus, .modal__close-btn:active {
+  filter: var(--firm-filter);
 }
 
 .edit-form__container {
@@ -782,7 +793,6 @@ body {
 
 .edit-form__contact.modal__input--wrong {
   border: 1px solid var(--red);
-  /* border-color: var(--red); */
 }
 
 .modal__err {
@@ -809,34 +819,54 @@ body {
 }
 
 .edit-form__add-contact-btn{
+  position: relative;
+  padding-left: 20px;
   transition: color var(--state-delay);
-}
-
-.edit-form__add-contact-btn > svg {
-  transform: translateY(3px);
-}
-
-.edit-form__add-contact-btn .add-svg__path {
-  fill: var(--firm);
-  transition: fill var(--state-delay);
-}
-
-.edit-form__add-contact-btn .add-svg__path--inverted {
-  fill: transparent;
-  transform: translate(1px,1px);
-  /* fill: var(--firm); */
-}
-
-.edit-form__add-contact-btn:hover .add-svg__path, .edit-form__add-contact-btn:focus .add-svg__path {
-  fill: transparent;
-}
-
-.edit-form__add-contact-btn:hover .add-svg__path--inverted, .edit-form__add-contact-btn:focus .add-svg__path--inverted {
-  fill: var(--firm);
 }
 
 .edit-form__add-contact-btn:hover, .edit-form__add-contact-btn:focus {
   color: var(--firm);
+}
+
+
+.edit-form__add-contact-btn::before{
+  content: '';
+  position: absolute;
+  display: block;
+  width: 16px;
+  height: 16px;
+  top: 50%;
+  left: 0px;
+  opacity: 1;
+  transform: translateY(-50%);
+  background-image: url(../img/add_circle_outline.svg);
+  background-repeat: no-repeat;
+  background-position: center center;
+  transition: opacity var(--state-delay);
+}
+
+.edit-form__add-contact-btn:hover::before, .edit-form__add-contact-btn:focus::before {
+  opacity: 0;
+}
+
+.edit-form__add-contact-btn::after{
+  content: '';
+  position: absolute;
+  display: block;
+  width: 16px;
+  height: 16px;
+  top: 50%;
+  left: 0px;
+  opacity: 0;
+  transform: translateY(-50%);
+  background-image: url(../img/add_circle_outline--invert.svg);
+  background-repeat: no-repeat;
+  background-position: center center;
+  transition: opacity var(--state-delay);
+}
+
+.edit-form__add-contact-btn:hover::after, .edit-form__add-contact-btn:focus::after {
+  opacity: 1;
 }
 
 .edit-form__controls {
@@ -948,6 +978,10 @@ body {
   background-color: #EDECF0;
 }
 
+.edit-form__choices .choices__list--dropdown .choices__item--selectable.is-selected {
+  display: none;
+}
+
 .edit-form__choices.choices[data-type*=select-one]:after{
   content: url(../img/arrow_back_ios.svg);
   top: 11px;
@@ -991,26 +1025,25 @@ body {
   height: 100%;
   display: block;
   border: 1px solid var(--grey);
-  filter: opacity(1);
-  fill: var(--txt_grey);  
-  transition: filter var(--state-delay), fill var(--state-delay), border-color var(--state-delay);
+  transition: filter var(--state-delay), border-color var(--state-delay);
 }
 
-.edit-form__del-contact-btn > svg {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translateY(-50%) translateX(-50%);
+.edit-form__del-contact-icon {
+  width: 100%;
+  height: 100%;
+  background-image: url(../img/cancel.svg);
+  background-repeat: no-repeat;
+  background-position: center center;
+  filter: var(--grey-filter);
+  transition: filter var(--state-delay);
 }
 
 .edit-form__del-contact-btn:hover, .edit-form__del-contact-btn:focus {
   border-color: var(--red);
-  fill: var(--red);
 }
 
-.edit-form__contact:invalid + .edit-form__del-contact-btn {
-  visibility: hidden;
-  filter: opacity(0);
+.edit-form__del-contact-btn:hover > .edit-form__del-contact-icon, .edit-form__del-contact-btn:focus > .edit-form__del-contact-icon {
+  filter: var(--red-filter);
 }
 
 .edit-form__contact-container:nth-child(n+10) + .edit-form__add-contact-btn{
@@ -1066,17 +1099,7 @@ body {
 }
 
 @media (max-width:768px) {
-   /* body {
-    width: max-content;
-  } */
-
-  .header {
-    /* width: fit-content; */
-    /* width: max-content; */
-  }
-
   .main {
-    /* width: max-content; */
     overflow: scroll;
   }
 
@@ -1084,11 +1107,6 @@ body {
   .main__container {
     min-width: 728px;
   } 
-
-  /* .header__container{
-    width: 100%;
-  }
- */
 
  .thead__th:last-child{
     width: initial;
@@ -1114,7 +1132,6 @@ body {
   
   .edit-form {
      width: 94%;
-     /* max-height: 90vh; */
   }
 
   .edit-form__container {

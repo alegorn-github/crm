@@ -2,7 +2,7 @@
 
 (()=>{
 
-    const serverURL = `http://${document.location.hostname}:3000/api/clients`;
+    const serverURL = `http://${document.location.hostname||'localhost'}:3000/api/clients`;
     let searchTimeout = null;
     let simpleBar = null;
     const searchWaitTime = 300;
@@ -59,7 +59,7 @@
             return { top: Math.round(top), left: Math.round(left) };
         }
         const edgeMargin = 3;        
-        const tippyTarget = (typeof elements === 'string')?document.querySelectorAll(elements):(element.constructor === NodeList)?element:new _NodeList(element);
+        const tippyTarget = (typeof elements === 'string')?document.querySelectorAll(elements):(elements.constructor === NodeList)?elements:[elements];
         const ballonElement = document.createElement('div');
         ballonElement.classList.add('tippy-ballon');
         const ballonArrow = document.createElement('div');
@@ -242,19 +242,11 @@
     }
 
     function getWaitElement(classNames){
-        const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
-        svg.setAttribute('viewBox','0 0 100 100');
+        const icon = document.createElement('div');
+        icon.classList.add('wait-icon');
+        icon.classList.add(...classNames.split(' '));
 
-        const path = document.createElementNS('http://www.w3.org/2000/svg','path');
-        path.setAttribute('d','M14.0002 50.0005C14.0002 69.8825 30.1182 86.0005 50.0002 86.0005C69.8822 86.0005 86.0002 69.8825 86.0002 50.0005C86.0002 30.1185 69.8823 14.0005 50.0003 14.0005C45.3513 14.0005 40.9082 14.8815 36.8282 16.4865');
-        path.setAttribute('stroke-width','8');
-        path.setAttribute('stroke-miterlimit','10');
-        path.setAttribute('stroke-linecap','round');
-        svg.appendChild(path);
-        svg.setAttribute('fill','none');
-        svg.setAttribute('class',classNames);
-
-        return svg;
+        return icon;
     }
 
     async function reloadTable(searchText = ''){
@@ -555,7 +547,6 @@
         document.querySelector('.modal-overlay').classList.remove('display-none');
         modalForm.classList.remove('display-none');
         addScrollbars(modalForm);
-        tippy('.edit-form [data-tippy-content]');
         document.querySelector('.edit-form__close-btn').focus();
     }
 
@@ -637,17 +628,12 @@
             addScrollbars(editForm);
         });
         deleteButton.dataset.tippyContent = 'Удалить контакт';
+        tippy(deleteButton);
 
-        const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
-        svg.setAttribute('width','16');
-        svg.setAttribute('height','16');
-        svg.setAttribute('viewBox','0 0 16 16');
+        const deleteIcon = document.createElement('div');
+        deleteIcon.classList.add('edit-form__del-contact-icon');
 
-        const path = document.createElementNS('http://www.w3.org/2000/svg','path');
-        path.setAttribute('d','M8 2C4.682 2 2 4.682 2 8C2 11.318 4.682 14 8 14C11.318 14 14 11.318 14 8C14 4.682 11.318 2 8 2ZM8 12.8C5.354 12.8 3.2 10.646 3.2 8C3.2 5.354 5.354 3.2 8 3.2C10.646 3.2 12.8 5.354 12.8 8C12.8 10.646 10.646 12.8 8 12.8ZM10.154 5L8 7.154L5.846 5L5 5.846L7.154 8L5 10.154L5.846 11L8 8.846L10.154 11L11 10.154L8.846 8L11 5.846L10.154 5Z');
-
-        svg.appendChild(path);
-        deleteButton.appendChild(svg);
+        deleteButton.appendChild(deleteIcon);
 
         contactContainerElement.append(contactTypeElement,contactInputElement,deleteButton);
 
@@ -658,6 +644,7 @@
             searchEnabled: false,
             itemSelectText: '',
             shouldSort: false,
+            placeholder: false,
             classNames: {
                 containerOuter: 'choices edit-form__choices',
             },
@@ -839,23 +826,6 @@
         logoButton.classList.add('header__logo', 'logo', 'button');
         logoButton.type = 'button';
 
-        const logoSvg = document.createElementNS('http://www.w3.org/2000/svg','svg');
-        logoSvg.setAttribute('class','logo__svg')
-        logoSvg.setAttribute('width','50');
-        logoSvg.setAttribute('height','50');
-        logoSvg.setAttribute('viewBox','0 0 50 50');
-        logoSvg.setAttribute('fill','none');
-
-        const svgCircle = document.createElementNS('http://www.w3.org/2000/svg','circle');
-        svgCircle.setAttribute('class','logo__circle');
-        svgCircle.setAttribute('cx', '25');
-        svgCircle.setAttribute('cy','25');
-        svgCircle.setAttribute('r','25');
-
-        const svgPath = document.createElementNS('http://www.w3.org/2000/svg','path');
-        svgPath.setAttribute('class','logo__path');
-        svgPath.setAttribute('d','M17.2617 29.082C17.2617 30.0898 16.9102 30.8574 16.207 31.3848C15.5098 31.9121 14.4639 32.1758 13.0693 32.1758C12.3545 32.1758 11.7451 32.126 11.2412 32.0264C10.7373 31.9326 10.2656 31.792 9.82617 31.6045V29.3896C10.3242 29.624 10.8838 29.8203 11.5049 29.9785C12.1318 30.1367 12.6826 30.2158 13.1572 30.2158C14.1299 30.2158 14.6162 29.9346 14.6162 29.3721C14.6162 29.1611 14.5518 28.9912 14.4229 28.8623C14.2939 28.7275 14.0713 28.5781 13.7549 28.4141C13.4385 28.2441 13.0166 28.0479 12.4893 27.8252C11.7334 27.5088 11.1768 27.2158 10.8193 26.9463C10.4678 26.6768 10.21 26.3691 10.0459 26.0234C9.8877 25.6719 9.80859 25.2412 9.80859 24.7314C9.80859 23.8584 10.1455 23.1846 10.8193 22.71C11.499 22.2295 12.46 21.9893 13.7021 21.9893C14.8857 21.9893 16.0371 22.2471 17.1562 22.7627L16.3477 24.6963C15.8555 24.4854 15.3955 24.3125 14.9678 24.1777C14.54 24.043 14.1035 23.9756 13.6582 23.9756C12.8672 23.9756 12.4717 24.1895 12.4717 24.6172C12.4717 24.8574 12.5977 25.0654 12.8496 25.2412C13.1074 25.417 13.667 25.6777 14.5283 26.0234C15.2959 26.334 15.8584 26.624 16.2158 26.8936C16.5732 27.1631 16.8369 27.4736 17.0068 27.8252C17.1768 28.1768 17.2617 28.5957 17.2617 29.082ZM21.9287 26.6562L23.0977 25.1621L25.8486 22.1738H28.8721L24.9697 26.4365L29.1094 32H26.0156L23.1855 28.0186L22.0342 28.9414V32H19.3535V18.3242H22.0342V24.4238L21.8936 26.6562H21.9287ZM35.9824 21.9893C37.1426 21.9893 38.0508 22.4434 38.707 23.3516C39.3633 24.2539 39.6914 25.4932 39.6914 27.0693C39.6914 28.6924 39.3516 29.9492 38.6719 30.8398C37.998 31.7305 37.0781 32.1758 35.9121 32.1758C34.7578 32.1758 33.8525 31.7568 33.1963 30.9189H33.0117L32.5635 32H30.5156V18.3242H33.1963V21.5059C33.1963 21.9102 33.1611 22.5576 33.0908 23.4482H33.1963C33.8232 22.4756 34.752 21.9893 35.9824 21.9893ZM35.1211 24.1338C34.459 24.1338 33.9756 24.3389 33.6709 24.749C33.3662 25.1533 33.208 25.8242 33.1963 26.7617V27.0518C33.1963 28.1064 33.3516 28.8623 33.6621 29.3193C33.9785 29.7764 34.4766 30.0049 35.1562 30.0049C35.707 30.0049 36.1436 29.7529 36.4658 29.249C36.7939 28.7393 36.958 28.001 36.958 27.0342C36.958 26.0674 36.7939 25.3438 36.4658 24.8633C36.1377 24.377 35.6895 24.1338 35.1211 24.1338ZM41.5283 30.7432C41.5283 30.251 41.6602 29.8789 41.9238 29.627C42.1875 29.375 42.5713 29.249 43.0752 29.249C43.5615 29.249 43.9365 29.3779 44.2002 29.6357C44.4697 29.8936 44.6045 30.2627 44.6045 30.7432C44.6045 31.2061 44.4697 31.5723 44.2002 31.8418C43.9307 32.1055 43.5557 32.2373 43.0752 32.2373C42.583 32.2373 42.2021 32.1084 41.9326 31.8506C41.6631 31.5869 41.5283 31.2178 41.5283 30.7432Z');
-        
         const searchContainer = document.createElement('div');
         searchContainer.classList.add('header__search-container');
 
@@ -894,11 +864,6 @@
 
         searchContainer.append(searchInput,searchResults);
 
-        logoSvg.appendChild(svgCircle);
-        logoSvg.appendChild(svgPath);
-
-        logoButton.appendChild(logoSvg);
-
         searchForm.append(logoButton,searchContainer);
 
         headerContainer.appendChild(searchForm);
@@ -935,21 +900,6 @@
         const theadRow = document.createElement('tr');
         theadRow.classList.add('thead__tr');
 
-        function getSortIcon(){
-            const sortIcon = document.createElementNS('http://www.w3.org/2000/svg','svg');
-            sortIcon.setAttribute('width','12');
-            sortIcon.setAttribute('height','12');
-            sortIcon.setAttribute('viewBox','0 0 12 12');
-            sortIcon.setAttribute('fill','');
-    
-            const sortIconPath = document.createElementNS('http://www.w3.org/2000/svg','path');
-            sortIconPath.setAttribute('d','M10 6L9.295 5.295L6.5 8.085L6.5 2H5.5L5.5 8.085L2.71 5.29L2 6L6 10L10 6Z');
-
-            sortIcon.appendChild(sortIconPath);
-
-            return sortIcon;
-        }
-
         function getColumnHeader(data){
 
             const thElement = document.createElement('th');
@@ -980,8 +930,6 @@
     
                 const sortSpan = document.createElement('span');
                 sortSpan.classList.add('thead__sort');
-    
-                sortSpan.appendChild(getSortIcon());
     
                 noWrapSpan.append(lastWord,sortSpan);
 
@@ -1031,17 +979,8 @@
             showEditForm();
         });
 
-
-
-        const addIcon = document.createElementNS('http://www.w3.org/2000/svg','svg');
-        addIcon.setAttribute('width','23');
-        addIcon.setAttribute('height','16');
-        addIcon.setAttribute('viewBox', '0 0 23 16');
-
-        const addIconPath = document.createElementNS('http://www.w3.org/2000/svg','path');
-        addIconPath.setAttribute('d','M14.5 8C16.71 8 18.5 6.21 18.5 4C18.5 1.79 16.71 0 14.5 0C12.29 0 10.5 1.79 10.5 4C10.5 6.21 12.29 8 14.5 8ZM5.5 6V3H3.5V6H0.5V8H3.5V11H5.5V8H8.5V6H5.5ZM14.5 10C11.83 10 6.5 11.34 6.5 14V16H22.5V14C22.5 11.34 17.17 10 14.5 10Z');
-
-        addIcon.appendChild(addIconPath);
+        const addIcon = document.createElement('span');
+        addIcon.classList.add('main__add-icon');
 
         addButton.append(addIcon,'Добавить клиента');
 
@@ -1082,23 +1021,11 @@
             closeModalWindow();
         });
 
-        const closeIcon = document.createElementNS('http://www.w3.org/2000/svg','svg');
-        closeIcon.setAttribute('viewBox','0 0 29 29');
-
-        const closeIconPath = document.createElementNS('http://www.w3.org/2000/svg','path');
-        closeIconPath.setAttribute('fill-rule','evenodd');
-        closeIconPath.setAttribute('clip-rule','evenodd');
-        closeIconPath.setAttribute('d','M22.2333 7.73333L21.2666 6.76666L14.4999 13.5334L7.73324 6.7667L6.76658 7.73336L13.5332 14.5L6.7666 21.2667L7.73327 22.2333L14.4999 15.4667L21.2666 22.2334L22.2332 21.2667L15.4666 14.5L22.2333 7.73333Z');
-
         if (options.elementName){
             modalFormElement.classList.add(options.elementName);
             modalForm.classList.add(`${options.elementName}__form`);
             closeButton.classList.add(`${options.elementName}__close-btn`);
         }
-
-        closeIcon.appendChild(closeIconPath);
-
-        closeButton.appendChild(closeIcon);
 
         modalForm.append(closeButton);
 
@@ -1173,26 +1100,7 @@
         addContactButton.type = 'button';
         addContactButton.classList.add('edit-form__add-contact-btn','button');
 
-        const addContactIcon = document.createElementNS('http://www.w3.org/2000/svg','svg');
-        addContactIcon.setAttribute('class','add-svg');
-        addContactIcon.setAttribute('width','16');
-        addContactIcon.setAttribute('height','16');
-        addContactIcon.setAttribute('viewBox','0 0 16 16');
-
-        const iconPath = document.createElementNS('http://www.w3.org/2000/svg','path');
-        iconPath.setAttribute('class','add-svg__path');
-        iconPath.setAttribute('d','M7.99998 4.66671C7.63331 4.66671 7.33331 4.96671 7.33331 5.33337V7.33337H5.33331C4.96665 7.33337 4.66665 7.63337 4.66665 8.00004C4.66665 8.36671 4.96665 8.66671 5.33331 8.66671H7.33331V10.6667C7.33331 11.0334 7.63331 11.3334 7.99998 11.3334C8.36665 11.3334 8.66665 11.0334 8.66665 10.6667V8.66671H10.6666C11.0333 8.66671 11.3333 8.36671 11.3333 8.00004C11.3333 7.63337 11.0333 7.33337 10.6666 7.33337H8.66665V5.33337C8.66665 4.96671 8.36665 4.66671 7.99998 4.66671ZM7.99998 1.33337C4.31998 1.33337 1.33331 4.32004 1.33331 8.00004C1.33331 11.68 4.31998 14.6667 7.99998 14.6667C11.68 14.6667 14.6666 11.68 14.6666 8.00004C14.6666 4.32004 11.68 1.33337 7.99998 1.33337ZM7.99998 13.3334C5.05998 13.3334 2.66665 10.94 2.66665 8.00004C2.66665 5.06004 5.05998 2.66671 7.99998 2.66671C10.94 2.66671 13.3333 5.06004 13.3333 8.00004C13.3333 10.94 10.94 13.3334 7.99998 13.3334Z');
-
-        const iconPathInverted = document.createElementNS('http://www.w3.org/2000/svg','path');
-        iconPathInverted.setAttribute('class','add-svg__path--inverted')
-        iconPathInverted.setAttribute('fill-rule','evenodd');
-        iconPathInverted.setAttribute('clip-rule','evenodd');
-        iconPathInverted.setAttribute('d','M0.333313 7.00016C0.333313 3.32016 3.31998 0.333496 6.99998 0.333496C10.68 0.333496 13.6666 3.32016 13.6666 7.00016C13.6666 10.6802 10.68 13.6668 6.99998 13.6668C3.31998 13.6668 0.333313 10.6802 0.333313 7.00016ZM6.33329 4.33366C6.33329 3.96699 6.63329 3.66699 6.99996 3.66699C7.36663 3.66699 7.66663 3.96699 7.66663 4.33366V6.33366H9.66663C10.0333 6.33366 10.3333 6.63366 10.3333 7.00033C10.3333 7.36699 10.0333 7.66699 9.66663 7.66699H7.66663V9.66699C7.66663 10.0337 7.36663 10.3337 6.99996 10.3337C6.63329 10.3337 6.33329 10.0337 6.33329 9.66699V7.66699H4.33329C3.96663 7.66699 3.66663 7.36699 3.66663 7.00033C3.66663 6.63366 3.96663 6.33366 4.33329 6.33366H6.33329V4.33366Z');
-
-        addContactIcon.appendChild(iconPath);
-        addContactIcon.appendChild(iconPathInverted);
-
-        addContactButton.append(addContactIcon,'Добавить контакт');
+        addContactButton.append('Добавить контакт');
         addContactButton.addEventListener('click', event => {
             addContactInput();
         });
@@ -1260,7 +1168,7 @@
         idElement.value = '';
 
         const errTextElement = document.createElement('span');
-        errTextElement.classList.add('delete-form__err','modal__err','display-none');
+        errTextElement.classList.add('delete-form__err','edit-form__err','modal__err','display-none');
 
         const deleteButton = document.createElement('button');
         deleteButton.classList.add('delete-form__submit-btn','modal__primary-btn','button');
