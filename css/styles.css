@@ -27,8 +27,7 @@
 
 @keyframes fadeIn {
   0%{opacity: 0}
-  100%{opacity: 0.7;}
-  
+  100%{opacity: 1;}
 }
 
 @keyframes rotate {
@@ -97,6 +96,47 @@ body {
 
 .display-none {
   display: none !important;
+}
+
+.tippy-ballon {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  display: none;
+  width: fit-content;
+  height: fit-content;
+  padding: 7px 14px;
+  border: none;
+  background-color: var(--black);
+  font-weight: bold;
+  font-size: 12px;
+  line-height: 16px;  
+  color: white;
+  white-space: nowrap;
+  transform: translateX(-50%);
+  z-index: 2;
+}
+
+.tippy-arrow {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  display: none;
+  border-top: 8px solid var(--black);
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-bottom: none;
+  transform: translateX(-50%) translateY(-1px);
+  z-index: 1;
+}
+
+.tippy--on {
+  position: relative;
+}
+
+
+.tippy--on > .tippy-ballon, .tippy--on > .tippy-arrow {
+  display: block;
 }
 
 /* * HEADER * */
@@ -451,16 +491,12 @@ body {
   font-size: 8px;
   line-height: 1;
   color: transparent;
-  opacity: 0.7;
-  transition: opacity var(--state-delay);
-}
-
-.row__contact{
-  /* transform: translateY(5px); */
+  filter: opacity(0.7);
+  transition: filter var(--state-delay);
 }
 
 .row__contact:hover, .row__contact:focus {
-  opacity: 1;
+  filter: opacity(1);
 }
 
 .row__contact--group{
@@ -505,6 +541,10 @@ body {
   opacity: 0;
   animation: fadeIn var(--state-delay) linear;
   animation-fill-mode: forwards;
+}
+
+.row__contact--group.display-none ~ .row__contact.tippy--on{
+  opacity: 1;
 }
 
 .row__contact--group.display-none ~ .row__contact:nth-child(6) {
@@ -660,7 +700,6 @@ body {
 /* * EDIT FORM * */
 
 .edit-form {
-  /* position: relative; */
   width: 450px;
   /* min-height: 400px; */
   max-height: 100vh;
@@ -669,6 +708,11 @@ body {
   font-size: 14px;
   line-height: 19px;
   color: var(--black);
+  overflow: hidden;
+}
+
+.overflow-y-scroll {
+  overflow-y: scroll;
 }
 
 .modal__form{
@@ -1101,16 +1145,6 @@ body {
     display: none;
   }
 
-  /* .header__form {
-    flex-direction: column;
-  } */
-
-  /* .header__container {
-    padding-top: 10px;
-    padding-bottom: 10px;
-  } */
-
-
   .header__search-container--mobile {
     position: static;
     display: block;
@@ -1131,4 +1165,10 @@ body {
     left: 0;
   }
   
+  .delete-form {
+    width: 94%;
+    background-color: white;
+    text-align: center;
+  
+  }  
 }
