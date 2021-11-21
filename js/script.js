@@ -2,7 +2,7 @@
 
 (()=>{
 
-    const serverURL = `http://${document.location.hostname||'localhost'}:3000/api/clients`;
+    const serverURL = `https://crm-backend-alegorn.herokuapp.com/api/clients`;
     let searchTimeout = null;
     let simpleBar = null;
     const searchWaitTime = 300;
